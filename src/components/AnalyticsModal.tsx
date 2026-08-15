@@ -91,7 +91,7 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ isOpen, onClose 
                 </h2>
                 <p className="text-xs text-white/90 flex items-center gap-1.5 font-medium">
                   <Database className="w-3.5 h-3.5" />
-                  <span>Sincronizado con Cloud Firestore DB & LocalStorage</span>
+                  <span>Guardado en este navegador</span>
                 </p>
               </div>
             </div>
@@ -356,7 +356,7 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ isOpen, onClose 
                 {selectedTab === 'logs' && (
                   <div className="space-y-3">
                     <h3 className="text-sm font-extrabold text-[#261C14] font-heading">
-                      Registros de Consultas en Firestore Database
+                      Registros de Consultas
                     </h3>
 
                     {logs.length === 0 ? (
