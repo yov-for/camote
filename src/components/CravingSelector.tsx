@@ -52,6 +52,23 @@ export const CravingSelector: React.FC<CravingSelectorProps> = ({
     setDescartados([]);
   };
 
+  // Elige el rival del ganador. La garantía dura de esta función es que NUNCA
+  // devuelve el mismo plato que ya está en pantalla: sin esto, si el plato
+  // elegido coincidía con el retador programado del torneo, la pantalla mostraba
+  // la misma opción arriba y abajo.
+  const elegirRetador = (ganadorId: string, evitar: string[], preferido?: Dish): Dish => {
+    const fuera = new Set([ganadorId, ...evitar]);
+
+    if (preferido && !fuera.has(preferido.id)) return preferido;
+
+    const libre = PERUVIAN_DISHES.find((d) => !fuera.has(d.id));
+    if (libre) return libre;
+
+    // No queda ningún plato sin descartar: se relajan los descartes previos,
+    // pero jamás se repite el ganador.
+    return PERUVIAN_DISHES.find((d) => d.id !== ganadorId) ?? PERUVIAN_DISHES[0];
+  };
+
   // Ninguno de los dos convence: se cambia el par sin declarar ganador y sin
   // consumir la ronda, para no obligar al usuario a elegir algo que no quiere.
   const handleDescartarAmbos = () => {
@@ -68,6 +85,11 @@ export const CravingSelector: React.FC<CravingSelectorProps> = ({
     } else {
       setDescartados(Array.from(fuera));
     }
+
+    // Con dos platos distintos garantizados no hace falta más; si el catálogo
+    // fuera tan corto que no alcanzara, se deja el par actual antes que mostrar
+    // el mismo plato dos veces.
+    if (disponibles.length < 2) return;
 
     setFlashOrange(true);
     setTimeout(() => setFlashOrange(false), 250);
@@ -86,9 +108,16 @@ export const CravingSelector: React.FC<CravingSelectorProps> = ({
 
     if (battleRound < 3) {
       const nextRound = battleRound + 1;
+      // El retador programado del torneo es solo una preferencia: si coincide
+      // con el ganador o con algo ya descartado, se busca otro.
+      const retador = elegirRetador(
+        chosenDish.id,
+        [loserDish.id, ...descartados],
+        tournamentChallengers[nextRound - 1]
+      );
       setBattleRound(nextRound);
       setCurrentWinner(chosenDish);
-      setCurrentChallenger(tournamentChallengers[nextRound - 1] || PERUVIAN_DISHES[2]);
+      setCurrentChallenger(retador);
     } else {
       // Round 3 Complete -> GRAND CHAMPION!
       setBattleWinnerDish(chosenDish);
@@ -136,6 +165,27 @@ export const CravingSelector: React.FC<CravingSelectorProps> = ({
     }, 220);
   };
 
+  // ==========================================
+  // CAMBIO DE MODO
+  // ==========================================
+  // Cada modo es una forma distinta de llegar a los antojos, así que al cambiar
+  // se empieza de cero: arrastrar la selección del modo anterior mezclaba platos
+  // elegidos con una dinámica dentro de otra, y el contador quedaba descuadrado.
+  const handleCambiarModo = (nuevoModo: CravingMethod) => {
+    // Tocar la pestaña ya activa no debe borrar nada.
+    if (nuevoModo === method) return;
+
+    setMethod(nuevoModo);
+    setSelectedDishes([]);
+
+    // Estado del modo batalla
+    handleStartBattleTournament();
+
+    // Estado del modo swipe
+    setSwipeIndex(0);
+    setSwipeDirection(null);
+  };
+
   return (
     <div className={`space-y-6 transition-colors duration-300 rounded-3xl ${flashOrange ? 'bg-[#FF6F00]/10' : ''}`}>
       {/* HEADER PRINCIPAL */}
@@ -152,7 +202,7 @@ export const CravingSelector: React.FC<CravingSelectorProps> = ({
       <div className="flex justify-center">
         <div className="bg-[#E8E2D5]/70 p-1.5 rounded-2xl flex items-center gap-1.5 max-w-md w-full shadow-inner">
           <button
-            onClick={() => setMethod('ranking_dinamico')}
+            onClick={() => handleCambiarModo('ranking_dinamico')}
             className={`flex-1 py-3 px-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
               method === 'ranking_dinamico'
                 ? 'bg-[#FF6F00] text-white shadow-md scale-[1.02]'
@@ -164,7 +214,7 @@ export const CravingSelector: React.FC<CravingSelectorProps> = ({
           </button>
 
           <button
-            onClick={() => setMethod('tinder_swiping')}
+            onClick={() => handleCambiarModo('tinder_swiping')}
             className={`flex-1 py-3 px-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
               method === 'tinder_swiping'
                 ? 'bg-[#4A148C] text-white shadow-md scale-[1.02]'
