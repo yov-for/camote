@@ -6,6 +6,7 @@ dist/
 coverage/
 .DS_Store
 *.log
+*.tsbuildinfo
 
 # Secretos. Nada de esto se sube a GitHub.
 # Ojo: ".env*" solo cubre archivos que EMPIEZAN con ".env" (.env, .env.local).
