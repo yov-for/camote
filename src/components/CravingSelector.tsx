@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { CravingMethod, Dish } from '../types';
 import { PERUVIAN_DISHES } from '../data/dishes';
-import { Swords, Flame, Heart, X, Trophy, Check, ArrowRight, RotateCcw, Sparkles } from 'lucide-react';
+import { Swords, Flame, Heart, X, Trophy, Check, ArrowRight, RotateCcw, Sparkles, SkipForward } from 'lucide-react';
 
 interface CravingSelectorProps {
   method: CravingMethod;
@@ -39,6 +39,9 @@ export const CravingSelector: React.FC<CravingSelectorProps> = ({
     PERUVIAN_DISHES[3], // Arroz Chaufa
   ];
 
+  // Platos que el usuario ya descartó con "Ninguno de los dos"
+  const [descartados, setDescartados] = useState<string[]>([]);
+
   // Initialize or reset tournament match
   const handleStartBattleTournament = () => {
     setBattleRound(1);
@@ -46,6 +49,31 @@ export const CravingSelector: React.FC<CravingSelectorProps> = ({
     setCurrentChallenger(PERUVIAN_DISHES[1]); // Lomo Saltado
     setRunnersUp([]);
     setBattleWinnerDish(null);
+    setDescartados([]);
+  };
+
+  // Ninguno de los dos convence: se cambia el par sin declarar ganador y sin
+  // consumir la ronda, para no obligar al usuario a elegir algo que no quiere.
+  const handleDescartarAmbos = () => {
+    const fuera = new Set([...descartados, currentWinner.id, currentChallenger.id]);
+    let disponibles = PERUVIAN_DISHES.filter((d) => !fuera.has(d.id));
+
+    if (disponibles.length < 2) {
+      // Ya vio prácticamente todo el catálogo: se reinicia el ciclo para que
+      // nunca se quede sin platos que mirar.
+      disponibles = PERUVIAN_DISHES.filter(
+        (d) => d.id !== currentWinner.id && d.id !== currentChallenger.id
+      );
+      setDescartados([]);
+    } else {
+      setDescartados(Array.from(fuera));
+    }
+
+    setFlashOrange(true);
+    setTimeout(() => setFlashOrange(false), 250);
+
+    setCurrentWinner(disponibles[0]);
+    setCurrentChallenger(disponibles[1]);
   };
 
   const handleBattleChoice = (chosenDish: Dish, loserDish: Dish) => {
@@ -224,6 +252,16 @@ export const CravingSelector: React.FC<CravingSelectorProps> = ({
                   </div>
                 </button>
               </div>
+
+              {/* NINGUNO DE LOS DOS: cambia el par sin elegir ganador */}
+              <button
+                onClick={handleDescartarAmbos}
+                className="w-full py-3 px-4 rounded-2xl border border-dashed border-[#E8E2D5] bg-white/60 text-[#7D6E65] hover:text-[#261C14] hover:border-[#FF6F00]/40 hover:bg-white font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-[0.99] cursor-pointer"
+                title="Cambiar los dos platos por otros"
+              >
+                <SkipForward className="w-4 h-4" />
+                <span>Ninguno de los dos, muéstrame otros</span>
+              </button>
             </div>
           ) : (
             /* CHAMPION CELEBRATION CARD */

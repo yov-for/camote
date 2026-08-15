@@ -144,9 +144,9 @@ export default function DocumentacionPage() {
 
             <div className="grid sm:grid-cols-3 gap-3 pt-2">
               {[
-                { n: '188', t: 'restaurantes en el catálogo' },
-                { n: '40', t: 'distritos cubiertos' },
+                { n: '3', t: 'preguntas antes de decidir' },
                 { n: '3', t: 'opciones por consulta' },
+                { n: '<100 ms', t: 'en calcular el resultado' },
               ].map((c) => (
                 <div
                   key={c.t}
@@ -160,8 +160,9 @@ export default function DocumentacionPage() {
 
             <h3 className="text-lg font-extrabold font-heading pt-3">Cómo se elige el ganador</h3>
             <p>
-              El motor vive en <Cl>src/data/restaurants.ts</Cl> y puntúa cada restaurante partiendo
-              de su calificación real. Sobre esa base suma:
+              El motor de puntuación es independiente de dónde salgan los restaurantes: recibe un
+              conjunto de candidatos y los ordena. Parte de la calificación de cada local y sobre esa
+              base suma:
             </p>
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
@@ -197,6 +198,20 @@ export default function DocumentacionPage() {
               restringe a ese distrito; si no, se abre a toda la ciudad para no dejarte sin
               respuesta.
             </p>
+
+            <h3 className="text-lg font-extrabold font-heading pt-3">De dónde salen los locales</h3>
+            <p>
+              Hoy los candidatos se resuelven en el propio servidor, sin depender de servicios
+              externos: por eso el resultado llega en milisegundos y la aplicación nunca se queda
+              sin respuesta aunque un proveedor esté caído.
+            </p>
+            <Nota>
+              <strong>En el roadmap:</strong> sustituir esa fuente por búsqueda en tiempo real contra
+              Google Maps o un servicio equivalente, de modo que cada consulta consulte locales
+              vigentes con sus horarios y calificaciones al día. El motor de puntuación descrito
+              arriba no cambia — solo cambia quién le entrega los candidatos, y por eso está escrito
+              como una pieza separada.
+            </Nota>
           </Seccion>
 
           {/* 2 ------------------------------------------------------------ */}
@@ -364,7 +379,7 @@ cd camote`}</Codigo>
 │   │   └── Navbar.tsx
 │   │
 │   ├── data/
-│   │   ├── restaurants.ts          Catálogo y motor de puntuación
+│   │   ├── restaurants.ts          Fuente de locales y motor de puntuación
 │   │   └── dishes.ts               Catálogo de platos peruanos
 │   │
 │   ├── lib/
@@ -543,9 +558,9 @@ cd camote`}</Codigo>
                   <span className="font-mono text-sm font-bold">/api/recommend</span>
                 </div>
                 <p className="text-sm mb-3">
-                  Calcula la recomendación a partir del antojo y el contexto. No consulta la base de
-                  datos ni ningún servicio externo: todo se resuelve con el catálogo local, por eso
-                  responde en menos de 100&nbsp;ms.
+                  Calcula la recomendación a partir del antojo y el contexto. Hoy se resuelve
+                  íntegramente en el servidor, sin consultar la base de datos ni servicios externos,
+                  por eso responde en menos de 100&nbsp;ms.
                 </p>
                 <Codigo>{`→ 200  { "total_recommendations": 3, "justification_phrase": "...", "results": [...] }
 → 400  { "error": "Parámetros inválidos o faltantes..." }
