@@ -1,0 +1,6 @@
+{
+  "name": "Camote",
+  "description": "Recomendador gastronómico peruano inteligente para decidir qué comer sin fatiga. Porque elegir qué comer ya no es yuca.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

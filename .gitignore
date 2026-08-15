@@ -1,0 +1,19 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+
+# Secretos. Nada de esto se sube a GitHub.
+# Ojo: ".env*" solo cubre archivos que EMPIEZAN con ".env" (.env, .env.local).
+# Por eso hace falta "*.env" también, o algo como "atlas-credentials.env" se
+# colaría al repo con la contraseña de Atlas adentro.
+.env*
+*.env
+*credentials*
+
+# La única excepción: la plantilla sin valores reales.
+!.env.example
