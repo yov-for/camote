@@ -151,18 +151,43 @@ export const CravingSelector: React.FC<CravingSelectorProps> = ({
   const targetSwipeCount = 3;
 
   const handleSwipeChoice = (liked: boolean) => {
-    setSwipeDirection(liked ? 'right' : 'left');
-
-    if (liked && !selectedDishes.includes(currentSwipeDish.id)) {
-      if (selectedDishes.length < targetSwipeCount) {
-        setSelectedDishes((prev) => [...prev, currentSwipeDish.id]);
-      }
+    // Si ya se llegó a los 3 antojos, seguir deslizando no aporta nada: se pasa
+    // al Paso 2. Cubre el caso de entrar al modo con una selección ya completa.
+    if (selectedDishes.length >= targetSwipeCount) {
+      onNext();
+      return;
     }
 
-    setTimeout(() => {
-      setSwipeDirection(null);
-      setSwipeIndex((prev) => prev + 1);
-    }, 220);
+    setSwipeDirection(liked ? 'right' : 'left');
+
+    const seAgrega = liked && !selectedDishes.includes(currentSwipeDish.id);
+    if (seAgrega) {
+      // El guard va dentro del actualizador, no fuera: con dos toques muy
+      // seguidos ambos verían el mismo estado anterior y se colarían un cuarto
+      // antojo o el mismo plato repetido.
+      setSelectedDishes((prev) =>
+        prev.length >= targetSwipeCount || prev.includes(currentSwipeDish.id)
+          ? prev
+          : [...prev, currentSwipeDish.id]
+      );
+    }
+
+    // ¿Este "me provoca" es el que completa los tres?
+    const completaSeleccion = seAgrega && selectedDishes.length + 1 >= targetSwipeCount;
+
+    setTimeout(
+      () => {
+        setSwipeDirection(null);
+        if (completaSeleccion) {
+          onNext();
+        } else {
+          setSwipeIndex((prev) => prev + 1);
+        }
+      },
+      // Una pausa algo mayor al completar, para que se alcance a ver el tercer
+      // plato marcado antes de saltar de pantalla.
+      completaSeleccion ? 480 : 220
+    );
   };
 
   // ==========================================
