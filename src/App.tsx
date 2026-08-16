@@ -30,16 +30,20 @@ import {
 export default function App() {
   const [step, setStep] = useState<'craving' | 'context' | 'loading' | 'recommendation'>('craving');
   const [method, setMethod] = useState<CravingMethod>('ranking_dinamico');
-  const [selectedDishes, setSelectedDishes] = useState<string[]>(['ceviche']);
+  const [selectedDishes, setSelectedDishes] = useState<string[]>([]);
   const [userId, setUserId] = useState<string>('usr_camote_default');
 
-  const [context, setContext] = useState<ContextData>({
+  // Un solo sitio define cómo se ve un arranque limpio: lo usan el estado
+  // inicial y el reinicio, así no pueden divergir.
+  const CONTEXTO_INICIAL: ContextData = {
     momentoDia: 'tarde',
     searchMotive: 'social_amigos',
     hungerLevel: 'alto',
     diningMode: 'presencial',
     priceRange: '$$',
-  });
+  };
+
+  const [context, setContext] = useState<ContextData>(CONTEXTO_INICIAL);
 
   const [location, setLocation] = useState<LocationData>({
     latitude: -12.046374,
@@ -68,25 +72,11 @@ export default function App() {
       const savedFavs = localStorage.getItem('camote_saved');
       if (savedFavs) setSavedItems(JSON.parse(savedFavs));
 
-      // Recuperar última recomendación guardada en MongoDB Atlas para este usuario
-      obtenerUltimaRecomendacion(uid)
-        .then((ultima) => {
-          if (ultima && ultima.restaurante_principal) {
-            setApiResponse({
-              total_recommendations: (ultima.opciones_alternativas?.length || 0) + 1,
-              justification_phrase: ultima.frase_justificacion,
-              results: [ultima.restaurante_principal, ...(ultima.opciones_alternativas || [])],
-            });
-            if (ultima.antojos_elegidos && ultima.antojos_elegidos.length > 0) {
-              setSelectedDishes(ultima.antojos_elegidos);
-            }
-            setStep('recommendation');
-            setApiReady(true);
-          }
-        })
-        .catch((err) => {
-          console.warn('No se pudo recuperar recomendación previa de MongoDB:', err);
-        });
+      // Abrir la app SIEMPRE empieza de cero, en la pantalla de antojos: no se
+      // restaura la última recomendación aunque siga guardada en MongoDB.
+      // Es una decisión de producto, no una limitación: entrar y encontrarse el
+      // resultado de la visita anterior confundía más que ayudaba. La
+      // recomendación se sigue guardando y se consulta desde el panel.
     } catch {
       // Ignore in non-browser environment
     }
@@ -109,6 +99,21 @@ export default function App() {
       console.warn('Failed to save items to localStorage');
     }
   }, [savedItems]);
+
+  // Vuelve al punto de partida: sin antojos marcados, sin contexto de la vuelta
+  // anterior y sin el resultado en pantalla. Empezar "de nuevo" arrastrando las
+  // respuestas previas hacía que la siguiente recomendación saliera casi igual.
+  // Los favoritos guardados no se tocan: son del usuario, no de esta búsqueda.
+  const reiniciarFlujo = () => {
+    setSelectedDishes([]);
+    setContext(CONTEXTO_INICIAL);
+    setMethod('ranking_dinamico');
+    setApiResponse(null);
+    setApiReady(false);
+    setApiError(null);
+    setSelectedResultModal(null);
+    setStep('craving');
+  };
 
   const handleStartRecommendation = async () => {
     setStep('loading');
@@ -227,9 +232,7 @@ export default function App() {
         onOpenLocation={() => setIsLocationOpen(true)}
         onOpenHistory={() => setIsHistoryOpen(true)}
         onOpenAnalytics={() => setIsAnalyticsOpen(true)}
-        onResetToHome={() => {
-          setStep('craving');
-        }}
+        onResetToHome={reiniciarFlujo}
       />
 
       {/* Main Container */}
@@ -266,7 +269,7 @@ export default function App() {
           <RecommendationView
             data={apiResponse}
             onSelectResult={(result) => setSelectedResultModal(result)}
-            onRestart={() => setStep('craving')}
+            onRestart={reiniciarFlujo}
             onSaveToHistory={handleSaveToHistory}
             isSaved={isPrincipalSaved}
           />

@@ -87,7 +87,7 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ isOpen, onClose 
               </div>
               <div>
                 <h2 className="text-xl font-extrabold font-heading tracking-tight">
-                  Panel de Análisis & Base de Datos
+                  Cómo has usado la app hasta ahora
                 </h2>
                 <p className="text-xs text-white/90 flex items-center gap-1.5 font-medium">
                   <Database className="w-3.5 h-3.5" />

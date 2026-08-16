@@ -67,7 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={onOpenAnalytics}
             className="p-2 rounded-xl bg-[#4A148C]/10 border border-[#4A148C]/30 text-[#4A148C] hover:bg-[#4A148C] hover:text-white transition-colors cursor-pointer"
-            title="Panel DB y Análisis de Datos"
+            title="Cómo has usado la app hasta ahora"
           >
             <BarChart3 className="w-4 h-4" />
           </button>
