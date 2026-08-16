@@ -1,4 +1,4 @@
-import { RecommendationResult, ContextData, LocationData } from '../types';
+import { RecommendationResult, ContextData, LocationData, SearchMotive } from '../types';
 
 export interface RestaurantData {
   id: string;
@@ -5052,11 +5052,25 @@ export const RESTAURANTS_DATABASE: RestaurantData[] = [
   }
 ];
 
+// Qué etiquetas del catálogo cuentan como "encaja con este plan".
+//
+// Normalmente el propio id del plan es la etiqueta. La excepción es 'familia':
+// se agregó al formulario después de armar el catálogo, así que ningún
+// restaurante la lleva. Sin esta equivalencia, elegir "comida en familia" no
+// sumaría nunca los +2 y daría resultados peores en silencio. Se asimila a
+// 'social_amigos', que es la etiqueta de sitios para ir en grupo.
+const EQUIVALENCIAS_MOTIVO: Partial<Record<SearchMotive, string[]>> = {
+  familia: ['familia', 'social_amigos'],
+};
+
 export function generateFallbackRecommendation(
   dishes: string[],
   context: ContextData,
   location: LocationData
 ): RecommendationResult[] {
+  const motivosEquivalentes =
+    EQUIVALENCIAS_MOTIVO[context.searchMotive] ?? [context.searchMotive];
+
   // Filter restaurants matching selected dishes or general mood
   let pool = [...RESTAURANTS_DATABASE];
 
@@ -5080,7 +5094,7 @@ export function generateFallbackRecommendation(
     if (dishes.some(d => r.tags.includes(d) || r.popularDishes.some(pd => pd.toLowerCase().includes(d.toLowerCase())))) {
       score += 4;
     }
-    if (r.tags.includes(context.searchMotive)) {
+    if (r.tags.some(t => motivosEquivalentes.includes(t))) {
       score += 2;
     }
     if (context.priceRange && r.priceRange === context.priceRange) {

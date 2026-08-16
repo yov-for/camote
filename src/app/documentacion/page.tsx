@@ -134,8 +134,8 @@ export default function DocumentacionPage() {
                 <strong>Antojo</strong> — qué plato se te apetece (ceviche, lomo saltado, etc.).
               </li>
               <li>
-                <strong>Contexto</strong> — con quién comes, cuánta hambre tienes y si es presencial
-                o delivery.
+                <strong>Contexto</strong> — momento del día, tipo de plan, cuánta hambre tienes, si
+                es presencial o delivery, y el presupuesto.
               </li>
               <li>
                 <strong>Resultado</strong> — un ganador destacado y dos opciones de respaldo.
@@ -373,7 +373,6 @@ cd camote`}</Codigo>
 │   │   ├── RecommendationView.tsx  Paso 3: el resultado
 │   │   ├── RestaurantDetailModal.tsx
 │   │   ├── LocationSelectorModal.tsx
-│   │   ├── OnboardingRestrictionsModal.tsx
 │   │   ├── HistoryModal.tsx
 │   │   ├── AnalyticsModal.tsx
 │   │   └── Navbar.tsx
@@ -423,7 +422,8 @@ cd camote`}</Codigo>
                     ['id', 'Identificador único de la recomendación'],
                     ['usuario_id', 'A quién pertenece; permite recuperar lo suyo al volver'],
                     ['antojos_elegidos', 'Los platos que la persona seleccionó'],
-                    ['motivo_busqueda', 'La ocasión: amigos, pareja, familia, solo…'],
+                    ['momento_dia', 'Si buscó de mañana, tarde o noche'],
+                    ['motivo_busqueda', 'El tipo de plan: solo, pareja, familia, amigos o ejecutivo'],
                     ['nivel_hambre', 'Cuánta hambre declaró'],
                     ['modalidad', 'Presencial o delivery'],
                     ['distrito', 'Zona desde la que buscó'],
@@ -448,6 +448,7 @@ cd camote`}</Codigo>
   "id": "rec_fb884e27",
   "usuario_id": "usr_camote_a1b2c3d",
   "antojos_elegidos": ["ceviche", "lomo_saltado"],
+  "momento_dia": "noche",
   "motivo_busqueda": "social_amigos",
   "nivel_hambre": "alto",
   "modalidad": "presencial",
@@ -471,11 +472,10 @@ cd camote`}</Codigo>
 }`}</Codigo>
 
             <Nota tono="alerta">
-              <strong>Pendiente a propósito:</strong> los favoritos y las restricciones alimentarias
-              siguen guardándose solo en el navegador, así que se pierden al cambiar de dispositivo.
-              Llevarlos a la nube requeriría dos colecciones más —{' '}
-              <Cl>favoritos</Cl> y <Cl>preferencias_usuario</Cl> — que no se crearon por la regla de
-              una sola colección.
+              <strong>Pendiente a propósito:</strong> los favoritos siguen guardándose solo en el
+              navegador, así que se pierden al cambiar de dispositivo. Llevarlos a la nube requeriría
+              una colección más — <Cl>favoritos</Cl> — que no se creó por la regla de una sola
+              colección.
             </Nota>
           </Seccion>
 

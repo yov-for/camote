@@ -36,11 +36,11 @@ export async function POST(req: NextRequest) {
     const results = generateFallbackRecommendation(
       payload.selected_dishes,
       {
+        momentoDia: payload.context?.momento_dia || 'tarde',
         searchMotive: payload.context?.search_motive || 'social_amigos',
         hungerLevel: payload.context?.hunger_level || 'alto',
         diningMode: payload.context?.dining_mode || 'presencial',
         priceRange: '$$',
-        dietaryRestrictions: [],
       },
       {
         latitude: payload.location_simulated?.latitude || -12.046374,

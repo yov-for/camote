@@ -1,6 +1,16 @@
 export type CravingMethod = 'ranking_dinamico' | 'tinder_swiping';
 
-export type SearchMotive = 'social_amigos' | 'pareja' | 'estudio_trabajo' | 'bajon_individual';
+// Tipo de plan. 'familia' se agregó después que el resto: el catálogo de
+// restaurantes todavía no tiene esa etiqueta, así que el motor la trata como
+// equivalente a 'social_amigos' (ver EQUIVALENCIAS_MOTIVO en data/restaurants).
+export type SearchMotive =
+  | 'social_amigos'
+  | 'pareja'
+  | 'familia'
+  | 'estudio_trabajo'
+  | 'bajon_individual';
+
+export type MomentoDia = 'manana' | 'tarde' | 'noche';
 
 export type HungerLevel = 'bajo' | 'medio' | 'alto';
 
@@ -20,11 +30,11 @@ export interface Dish {
 }
 
 export interface ContextData {
+  momentoDia: MomentoDia;
   searchMotive: SearchMotive;
   hungerLevel: HungerLevel;
   diningMode: DiningMode;
   priceRange: PriceRange;
-  dietaryRestrictions: string[];
 }
 
 export interface LocationData {

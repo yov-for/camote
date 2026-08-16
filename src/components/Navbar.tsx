@@ -1,26 +1,22 @@
 'use client';
 
 import React from 'react';
-import { MapPin, ShieldAlert, History, BarChart3 } from 'lucide-react';
+import { MapPin, History, BarChart3 } from 'lucide-react';
 import { LocationData } from '../types';
 
 interface NavbarProps {
   location: LocationData;
   onOpenLocation: () => void;
-  onOpenRestrictions: () => void;
   onOpenHistory: () => void;
   onOpenAnalytics: () => void;
-  restrictionsCount: number;
   onResetToHome: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   location,
   onOpenLocation,
-  onOpenRestrictions,
   onOpenHistory,
   onOpenAnalytics,
-  restrictionsCount,
   onResetToHome,
 }) => {
   return (
@@ -56,25 +52,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="max-w-[90px] sm:max-w-[140px] truncate">
               {location.distrito}
             </span>
-          </button>
-
-          {/* Restrictions Toggle */}
-          <button
-            onClick={onOpenRestrictions}
-            className={`relative flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-colors cursor-pointer ${
-              restrictionsCount > 0
-                ? 'bg-[#4A148C]/10 border-[#4A148C] text-[#4A148C]'
-                : 'bg-white border-[#E8E2D5] text-[#7D6E65] hover:border-[#261C14]'
-            }`}
-            title="Dietas y alergias"
-          >
-            <ShieldAlert className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Dietas</span>
-            {restrictionsCount > 0 && (
-              <span className="w-4 h-4 rounded-full bg-[#4A148C] text-white text-[10px] font-bold flex items-center justify-center">
-                {restrictionsCount}
-              </span>
-            )}
           </button>
 
           {/* History Button */}

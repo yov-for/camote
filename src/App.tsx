@@ -12,7 +12,6 @@ import { ContextSelector } from './components/ContextSelector';
 import { LoadingScreen } from './components/LoadingScreen';
 import { RecommendationView } from './components/RecommendationView';
 import { RestaurantDetailModal } from './components/RestaurantDetailModal';
-import { OnboardingRestrictionsModal } from './components/OnboardingRestrictionsModal';
 import { LocationSelectorModal } from './components/LocationSelectorModal';
 import { HistoryModal } from './components/HistoryModal';
 import { AnalyticsModal } from './components/AnalyticsModal';
@@ -35,11 +34,11 @@ export default function App() {
   const [userId, setUserId] = useState<string>('usr_camote_default');
 
   const [context, setContext] = useState<ContextData>({
+    momentoDia: 'tarde',
     searchMotive: 'social_amigos',
     hungerLevel: 'alto',
     diningMode: 'presencial',
     priceRange: '$$',
-    dietaryRestrictions: [],
   });
 
   const [location, setLocation] = useState<LocationData>({
@@ -51,11 +50,10 @@ export default function App() {
     isCustomOrSimulated: true,
   });
 
-  const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
-  // PENDIENTE (segunda colección, no creada a propósito): los favoritos y las
-  // restricciones alimentarias siguen viviendo en localStorage, así que se
-  // pierden si el usuario cambia de navegador. Harían falta las colecciones
-  // 'favoritos' y 'preferencias_usuario'. Hoy solo persistimos 'recomendaciones'.
+  // PENDIENTE (segunda colección, no creada a propósito): los favoritos siguen
+  // viviendo en localStorage, así que se pierden si el usuario cambia de
+  // navegador. Haría falta una colección 'favoritos'. Hoy solo persistimos
+  // 'recomendaciones'.
   const [savedItems, setSavedItems] = useState<SavedRecommendation[]>([]);
 
   useEffect(() => {
@@ -67,8 +65,6 @@ export default function App() {
       }
       setUserId(uid);
 
-      const savedRest = localStorage.getItem('camote_restrictions');
-      if (savedRest) setDietaryRestrictions(JSON.parse(savedRest));
       const savedFavs = localStorage.getItem('camote_saved');
       if (savedFavs) setSavedItems(JSON.parse(savedFavs));
 
@@ -102,18 +98,8 @@ export default function App() {
 
   const [selectedResultModal, setSelectedResultModal] = useState<RecommendationResult | null>(null);
   const [isLocationOpen, setIsLocationOpen] = useState<boolean>(false);
-  const [isRestrictionsOpen, setIsRestrictionsOpen] = useState<boolean>(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState<boolean>(false);
-
-  // Save dietary restrictions to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('camote_restrictions', JSON.stringify(dietaryRestrictions));
-    } catch (e) {
-      console.warn('Failed to save restrictions to localStorage');
-    }
-  }, [dietaryRestrictions]);
 
   // Save recommendations to localStorage
   useEffect(() => {
@@ -137,6 +123,7 @@ export default function App() {
       mood_preference_method: method,
       selected_dishes: selectedDishes.length > 0 ? selectedDishes : ['ceviche'],
       context: {
+        momento_dia: context.momentoDia,
         search_motive: context.searchMotive,
         hunger_level: context.hungerLevel,
         dining_mode: context.diningMode,
@@ -177,6 +164,7 @@ export default function App() {
         await guardarRecomendacion({
           usuario_id: activeUserId,
           antojos_elegidos: selectedDishes.length > 0 ? selectedDishes : ['ceviche'],
+          momento_dia: context.momentoDia,
           motivo_busqueda: context.searchMotive,
           nivel_hambre: context.hungerLevel,
           modalidad: context.diningMode,
@@ -204,13 +192,7 @@ export default function App() {
       setApiReady(true);
 
       // Registro local para el panel de analítica
-      logRecommendationEvent(
-        selectedDishes,
-        context,
-        location,
-        { dietaryRestrictions, allergies: [], priceRange: context.priceRange },
-        data
-      );
+      logRecommendationEvent(selectedDishes, context, location, data);
     } catch (err: any) {
       console.error('API call failed:', err);
       setApiError('Tuvimos un problema en la cocina. ¡Intenta de nuevo!');
@@ -243,10 +225,8 @@ export default function App() {
       <Navbar
         location={location}
         onOpenLocation={() => setIsLocationOpen(true)}
-        onOpenRestrictions={() => setIsRestrictionsOpen(true)}
         onOpenHistory={() => setIsHistoryOpen(true)}
         onOpenAnalytics={() => setIsAnalyticsOpen(true)}
-        restrictionsCount={dietaryRestrictions.length}
         onResetToHome={() => {
           setStep('craving');
         }}
@@ -297,13 +277,6 @@ export default function App() {
       <RestaurantDetailModal
         result={selectedResultModal}
         onClose={() => setSelectedResultModal(null)}
-      />
-
-      <OnboardingRestrictionsModal
-        isOpen={isRestrictionsOpen}
-        onClose={() => setIsRestrictionsOpen(false)}
-        restrictions={dietaryRestrictions}
-        setRestrictions={setDietaryRestrictions}
       />
 
       <LocationSelectorModal

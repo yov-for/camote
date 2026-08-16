@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { ContextData, SearchMotive, HungerLevel, DiningMode, PriceRange } from '../types';
-import { Users, Heart, Briefcase, Moon, UtensilsCrossed, Bike, ArrowLeft, ArrowRight, Sparkles, Zap } from 'lucide-react';
+import { ContextData, SearchMotive, MomentoDia, HungerLevel, DiningMode, PriceRange } from '../types';
+import { Users, Heart, Briefcase, Moon, Home, Sunrise, Sun, UtensilsCrossed, Bike, ArrowLeft, ArrowRight, Sparkles, Zap } from 'lucide-react';
 
 interface ContextSelectorProps {
   context: ContextData;
@@ -17,35 +17,62 @@ export const ContextSelector: React.FC<ContextSelectorProps> = ({
   onBack,
   onSubmit,
 }) => {
-  const motives: { id: SearchMotive; title: string; subtitle: string; icon: React.ReactNode }[] = [
+  const momentos: { id: MomentoDia; title: string; desc: string; icon: React.ReactNode }[] = [
     {
-      id: 'social_amigos',
-      title: 'Con Amigos',
-      subtitle: 'Para elegir rápido sin pelear horas :v',
-      icon: <Users className="w-5 h-5 text-[#FF6F00]" />,
+      id: 'manana',
+      title: 'Mañana',
+      desc: 'Desayuno o media mañana',
+      icon: <Sunrise className="w-5 h-5 text-amber-500" />,
     },
     {
-      id: 'pareja',
-      title: 'En Pareja',
-      subtitle: 'Chao al clásico "no sé, tú decide..."',
-      icon: <Heart className="w-5 h-5 text-[#4A148C]" />,
+      id: 'tarde',
+      title: 'Tarde',
+      desc: 'Almuerzo o lonche',
+      icon: <Sun className="w-5 h-5 text-[#FF6F00]" />,
     },
     {
-      id: 'estudio_trabajo',
-      title: 'Trabajo / Estudio',
-      subtitle: 'Menú express o grupo rápido',
-      icon: <Briefcase className="w-5 h-5 text-amber-600" />,
-    },
-    {
-      id: 'bajon_individual',
-      title: 'Bajón Nocturno / Solo',
-      subtitle: 'Comida contundente directo al grano',
+      id: 'noche',
+      title: 'Noche',
+      desc: 'Cena o bajón nocturno',
       icon: <Moon className="w-5 h-5 text-indigo-600" />,
     },
   ];
 
+  const motives: { id: SearchMotive; title: string; subtitle: string; icon: React.ReactNode }[] = [
+    {
+      id: 'bajon_individual',
+      title: 'Plan de 1',
+      subtitle: 'Solo tú y tu antojo, sin negociar',
+      icon: <Moon className="w-5 h-5 text-indigo-600" />,
+    },
+    {
+      id: 'pareja',
+      title: 'Cita en Pareja',
+      subtitle: 'Chao al clásico "no sé, tú decide..."',
+      icon: <Heart className="w-5 h-5 text-[#4A148C]" />,
+    },
+    {
+      id: 'familia',
+      title: 'Comida en Familia',
+      subtitle: 'Mesa grande y gustos para todos',
+      icon: <Home className="w-5 h-5 text-[#00A86B]" />,
+    },
+    {
+      id: 'social_amigos',
+      title: 'Quedada con Amigos',
+      subtitle: 'Para elegir rápido sin pelear horas :v',
+      icon: <Users className="w-5 h-5 text-[#FF6F00]" />,
+    },
+    {
+      id: 'estudio_trabajo',
+      title: 'Reunión Ejecutiva',
+      subtitle: 'Ambiente para conversar de trabajo',
+      icon: <Briefcase className="w-5 h-5 text-amber-600" />,
+    },
+  ];
+
   const hungerLevels: { id: HungerLevel; title: string; desc: string; emoji: string }[] = [
-    { id: 'bajo', title: 'Piqueo / Ligero', desc: 'Algo suave para matar el gusano', emoji: '🥗' },
+    { id: 'bajo', title: 'Piqueo / Ligero', desc: 'Solo para picar algo sin llenarte', emoji: '🥗' },
     { id: 'medio', title: 'Medio / Normal', desc: 'Su plato bien despachado', emoji: '🍛' },
     { id: 'alto', title: '¡Hambre Feroz!', desc: 'Porción bravasa / Bajón total 🦁', emoji: '🦁' },
   ];
@@ -77,10 +104,39 @@ export const ContextSelector: React.FC<ContextSelectorProps> = ({
         </p>
       </div>
 
-      {/* SECTION 1: MOTIVO Y COMPAÑÍA */}
+      {/* SECTION 1: MOMENTO DEL DÍA */}
       <div className="space-y-2 bg-white p-4 sm:p-5 rounded-2xl border border-[#E8E2D5] shadow-xs">
-        <label className="text-xs font-extrabold uppercase tracking-wider text-[#261C14] flex items-center gap-1.5">
-          <span>1. ¿Con quién estás o cuál es el plan?</span>
+        <label className="text-xs font-extrabold uppercase tracking-wider text-[#261C14]">
+          1. ¿En qué momento del día?
+        </label>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+          {momentos.map((item) => {
+            const isSelected = context.momentoDia === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setContext(prev => ({ ...prev, momentoDia: item.id }))}
+                className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-3 ${
+                  isSelected
+                    ? 'border-[#FF6F00] bg-[#FF6F00]/5 ring-2 ring-[#FF6F00]/20 shadow-xs'
+                    : 'border-[#E8E2D5] bg-white hover:border-[#FF6F00]/50'
+                }`}
+              >
+                <div className="p-2 rounded-lg bg-stone-100 flex-shrink-0">{item.icon}</div>
+                <div>
+                  <h4 className="font-bold text-sm text-[#261C14] font-heading">{item.title}</h4>
+                  <p className="text-[11px] text-[#7D6E65] mt-0.5">{item.desc}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* SECTION 2: TIPO DE PLAN */}
+      <div className="space-y-2 bg-white p-4 sm:p-5 rounded-2xl border border-[#E8E2D5] shadow-xs">
+        <label className="text-xs font-extrabold uppercase tracking-wider text-[#261C14]">
+          2. ¿Qué tipo de plan es?
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
           {motives.map((item) => {
@@ -111,7 +167,7 @@ export const ContextSelector: React.FC<ContextSelectorProps> = ({
       {/* SECTION 2: NIVEL DE HAMBRE */}
       <div className="space-y-2 bg-white p-4 sm:p-5 rounded-2xl border border-[#E8E2D5] shadow-xs">
         <label className="text-xs font-extrabold uppercase tracking-wider text-[#261C14]">
-          2. Nivel de Hambre del momento:
+          3. Nivel de Hambre del momento:
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
           {hungerLevels.map((lvl) => {
@@ -140,7 +196,7 @@ export const ContextSelector: React.FC<ContextSelectorProps> = ({
         {/* MODO */}
         <div className="space-y-2 bg-white p-4 sm:p-5 rounded-2xl border border-[#E8E2D5] shadow-xs">
           <label className="text-xs font-extrabold uppercase tracking-wider text-[#261C14]">
-            3. Modo de Consumo:
+            4. Modo de Consumo:
           </label>
           <div className="space-y-2 pt-1">
             {diningModes.map((mode) => {
@@ -169,7 +225,7 @@ export const ContextSelector: React.FC<ContextSelectorProps> = ({
         {/* PRESUPUESTO */}
         <div className="space-y-2 bg-white p-4 sm:p-5 rounded-2xl border border-[#E8E2D5] shadow-xs">
           <label className="text-xs font-extrabold uppercase tracking-wider text-[#261C14]">
-            4. Presupuesto aproximado:
+            5. Presupuesto aproximado:
           </label>
           <div className="space-y-2 pt-1">
             {priceRanges.map((pr) => {

@@ -53,6 +53,11 @@ export async function POST(request: Request) {
 
   // Extracción de datos
   const usuario_id = typeof b.usuario_id === 'string' ? b.usuario_id.trim() : '';
+  // Campo agregado después: los registros antiguos no lo tienen, así que no se
+  // exige y se cae a 'tarde' en vez de rechazar la petición.
+  const momento_dia = typeof b.momento_dia === 'string' && b.momento_dia.trim()
+    ? b.momento_dia.trim()
+    : 'tarde';
   const motivo_busqueda = typeof b.motivo_busqueda === 'string' ? b.motivo_busqueda.trim() : '';
   const nivel_hambre = typeof b.nivel_hambre === 'string' ? b.nivel_hambre.trim() : '';
   const modalidad = typeof b.modalidad === 'string' ? b.modalidad.trim() : '';
@@ -130,6 +135,7 @@ export async function POST(request: Request) {
       id: `rec_${randomUUID().substring(0, 8)}`,
       usuario_id,
       antojos_elegidos,
+      momento_dia,
       motivo_busqueda,
       nivel_hambre,
       modalidad,

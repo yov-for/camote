@@ -10,19 +10,12 @@ import { ContextData, LocationData, RecommendationResponse, RecommendationResult
 // harían falta las colecciones 'eventos_recomendacion' y 'favoritos' en Mongo,
 // con endpoints propios. Hoy solo persistimos 'recomendaciones' en la nube.
 
-export interface RestrictionInfo {
-  dietaryRestrictions: string[];
-  allergies?: string[];
-  priceRange?: string;
-}
-
 export interface RecommendationLogDoc {
   id?: string;
   sessionId: string;
   selectedDishes: string[];
   context: ContextData;
   location: LocationData;
-  restrictions: RestrictionInfo;
   winnerRestaurant: string;
   winnerDish: string;
   category: string;
@@ -86,7 +79,6 @@ export const logRecommendationEvent = (
   selectedDishes: string[],
   context: ContextData,
   location: LocationData,
-  restrictions: RestrictionInfo,
   recommendation: RecommendationResponse
 ): void => {
   const principal =
@@ -98,7 +90,6 @@ export const logRecommendationEvent = (
     selectedDishes,
     context,
     location,
-    restrictions,
     winnerRestaurant: principal?.restaurant_name || 'Desconocido',
     winnerDish: principal?.dish_highlight || 'Desconocido',
     category: principal?.category || 'Criollo',

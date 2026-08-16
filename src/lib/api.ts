@@ -4,6 +4,7 @@ export interface RecomendacionDoc {
   id: string;
   usuario_id: string;
   antojos_elegidos: string[];
+  momento_dia?: string;
   motivo_busqueda: string;
   nivel_hambre: string;
   modalidad: string;
@@ -17,6 +18,7 @@ export interface RecomendacionDoc {
 export interface GuardarRecomendacionInput {
   usuario_id: string;
   antojos_elegidos: string[];
+  momento_dia?: string;
   motivo_busqueda: string;
   nivel_hambre: string;
   modalidad: string;
